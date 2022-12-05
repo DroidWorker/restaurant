@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
-import 'package:restaurant_v2/domain/data/dish.dart';
-import 'package:restaurant_v2/domain/data/menuItem.dart';
+import 'package:restaurant_v2/domain/model/dish.dart';
+import 'package:restaurant_v2/domain/model/menuItem.dart';
 import 'package:restaurant_v2/presentation/menuCategory.dart';
 import 'package:restaurant_v2/presentation/topItem.dart';
 
@@ -15,8 +15,8 @@ class _state extends State<MenuScreenWidget>{
   int type = 0;
   int categoryId = 0;
   List dishes = [
-    Dish(name: "Крем-суп из тыквы", compound: "Тыква,  репчатый лук,  чеснок,  сливочное масло,  сливки,  растительное масло,  бекон, соль . . .", price: "16 р", weight: "220 г", imgPath: "assets/images/image.png"),
-    Dish(name: "Крем-суп из тыквы", compound: "Курица,  перловая крупа,  сухие грибы,  картофель, морковь, лук, масло растительное, соль", price: "10 р", weight: "320 г", imgPath: "assets/images/image.png")
+    Dish(id:"", type: "", name: "Крем-суп из тыквы", compound: "Тыква,  репчатый лук,  чеснок,  сливочное масло,  сливки,  растительное масло,  бекон, соль . . .", price: "16 р", weight: "220 г", cookTime: "", options: List.empty(), imgPath: "assets/images/image.png"),
+    Dish(id:"", type:"", name: "Крем-суп из тыквы", compound: "Курица,  перловая крупа,  сухие грибы,  картофель, морковь, лук, масло растительное, соль", price: "10 р", weight: "320 г", cookTime: "", options: List.empty(), imgPath: "assets/images/image.png")
   ];
   List menuCategories = [
     MenuItem(id: 0, name: "Горячее", imgPath: "assets/images/hot.png"),

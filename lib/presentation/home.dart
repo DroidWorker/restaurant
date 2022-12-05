@@ -1,6 +1,8 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:restaurant_v2/data/repository.dart';
+import 'package:restaurant_v2/domain/model/dish.dart';
 import 'package:restaurant_v2/presentation/aboutScreen.dart';
 import 'package:restaurant_v2/presentation/authRegScreen.dart';
 import 'package:restaurant_v2/presentation/menuTop.dart';
@@ -79,7 +81,13 @@ class _HomeState extends State<Home> {
         ),
         actions: [
           IconButton(onPressed: (){
-            DB.register("surname", "name", "+35986542136", "{email}", "password");
+            //DB.register("surname", "name", "+35986542136", "{email}", "password");
+            DB.getDishesByType("eat");
+            Repository.dishesController.stream.listen((item) =>
+            (item as List<Dish>).forEach((element) {
+              print("aaa01-"+element.name);
+            })
+            );
             }, icon: const Icon(Icons.share, color: Colors.white)),
           IconButton(onPressed: (){}, icon: Image.asset("assets/images/backet.png")),
           //IconButton(onPressed: () => Scaffold.of().openDrawer(), icon: const Icon(Icons.menu, color: Colors.white))

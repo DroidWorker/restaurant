@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:restaurant_v2/presentation/orderListItem.dart';
 
-import '../domain/data/dish.dart';
+import '../domain/model/dish.dart';
 
 class OrderListScreenWidget extends StatefulWidget{
   const OrderListScreenWidget({Key? key}) : super(key: key);
@@ -13,8 +13,8 @@ class OrderListScreenWidget extends StatefulWidget{
 
 class _state extends State<OrderListScreenWidget>{
   List dishes = [
-    Dish(name: "Крем-суп из тыквы", compound: "Тыква,  репчатый лук,  чеснок,  сливочное масло,  сливки,  растительное масло,  бекон, соль . . .", price: "16 р", weight: "220 г", imgPath: "assets/images/image.png"),
-    Dish(name: "Крем-суп из тыквы", compound: "Курица,  перловая крупа,  сухие грибы,  картофель, морковь, лук, масло растительное, соль", price: "10 р", weight: "320 г", imgPath: "assets/images/image.png")
+    Dish(id: "", type: "", name: "Крем-суп из тыквы", compound: "Тыква,  репчатый лук,  чеснок,  сливочное масло,  сливки,  растительное масло,  бекон, соль . . .", price: "16 р", weight: "220 г", cookTime: "", options: List.empty(), imgPath: "assets/images/image.png"),
+    Dish(id: "", type: "", name: "Крем-суп из тыквы", compound: "Курица,  перловая крупа,  сухие грибы,  картофель, морковь, лук, масло растительное, соль", price: "10 р", weight: "320 г", cookTime: "", options: List.empty(), imgPath: "assets/images/image.png")
   ];
 
   String getSumm(){
