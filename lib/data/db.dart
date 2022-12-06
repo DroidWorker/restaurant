@@ -1,8 +1,14 @@
 import 'package:firebase_database/firebase_database.dart';
+import 'package:flutter/material.dart';
 import 'package:restaurant_v2/data/repository.dart';
 import 'package:restaurant_v2/domain/model/dish.dart';
 import 'package:restaurant_v2/domain/model/dishOption.dart';
 import 'package:restaurant_v2/domain/model/feedback.dart';
+import 'package:restaurant_v2/domain/model/myOrder.dart';
+import 'package:restaurant_v2/domain/model/orderOption.dart';
+import 'package:restaurant_v2/domain/model/table.dart';
+
+import '../domain/model/orderItem.dart';
 
 class DB{
   static void register(String surname, String name, String phone, String email, String password) async{
@@ -221,7 +227,7 @@ class DB{
     DatabaseReference ref = FirebaseDatabase(
         databaseURL: "https://restaurant-2f63c-default-rtdb.europe-west1.firebasedatabase.app/").ref("feedbacks/");
     final snapshot = await ref.get();
-    var feedbacks = List<Feedback>.empty(growable: true);
+    var feedbacks = List<FeedbackItem>.empty(growable: true);
     if (snapshot.exists) {
       for (var element in snapshot.children) {
         String name ="";
@@ -236,7 +242,7 @@ class DB{
         }
         if(name.isNotEmpty&&text.isNotEmpty) {
           feedbacks.add(
-              Feedback(id: element.key.toString(), name: name, text: text));
+              FeedbackItem(id: element.key.toString(), name: name, text: text));
         }
       }}else{
       print('No data available.');
@@ -260,6 +266,151 @@ class DB{
         "name":name,
         "text": text
       });
+    }else{
+      print('No data available.');
+    }
+  }
+
+  static void addOrder(String userId, String comment, String tableId, Map<String, DishOrderItem> dishes) async{
+    DatabaseReference ref = FirebaseDatabase(
+        databaseURL: "https://restaurant-2f63c-default-rtdb.europe-west1.firebasedatabase.app/").ref("orders/");
+    final snapshot = await ref.get();
+    if(snapshot.exists){
+      await ref.child(userId).set({
+        "comment":comment,
+        "tableId": tableId,
+        "dishes": dishes
+      });
+    }else{
+      print('No data available.');
+    }
+  }
+
+  static void getOrderByUserId(String userId) async{
+    DatabaseReference ref = FirebaseDatabase(
+        databaseURL: "https://restaurant-2f63c-default-rtdb.europe-west1.firebasedatabase.app/").ref("orders/"+userId);
+    final snapshot = await ref.get();
+    if(snapshot.exists){
+      String comment = "";
+      String tableId = "";
+      Map<String, DishOrderItem> dishes = {};
+      for (var element in snapshot.children) {
+        switch(element.key){
+          case "comment":
+            comment = element.value.toString();
+            break;
+          case "tableId":
+            tableId = element.value.toString();
+            break;
+          case "dishes":
+            for (var element in element.children) {
+              String dishType = "";
+              List<OrderOption> opts = List<OrderOption>.empty(growable: true);
+              for (var element in element.children) {
+                switch(element.key){
+                  case "dishType":
+                    dishType = element.value.toString();
+                    break;
+                  case "options":
+                    var optPair = element.value.toString().split("|");
+                    for (var pair in optPair) {
+                      opts.add(OrderOption(name: pair.split("-")[0], value: pair.split("-")[1]));
+                    }
+                    break;
+                }
+              }
+              DishOrderItem doi = DishOrderItem(options: opts, dishType: dishType);
+              dishes[element.value.toString()] = doi;
+            }
+            break;
+        }
+      }
+      Repository.myOrderController.add(MyOrder(accountId: userId, comment: comment, tableId: tableId, dishes: dishes));
+    }else{
+      print('No data available.');
+    }
+  }
+
+  static void getTop()async{
+    DatabaseReference ref = FirebaseDatabase(
+        databaseURL: "https://restaurant-2f63c-default-rtdb.europe-west1.firebasedatabase.app/").ref("top/");
+    final snapshot = await ref.get();
+    if(snapshot.exists){
+      var dishList = List<Dish>.empty(growable: true);
+      var topList = List<String>.empty(growable: true);
+      for (var element in snapshot.children) {
+        topList.add(element.value.toString());
+      }
+      for (var element in topList) {
+        ref = FirebaseDatabase(
+            databaseURL: "https://restaurant-2f63c-default-rtdb.europe-west1.firebasedatabase.app/").ref(element);
+        final snapshot = await ref.get();
+        if(snapshot.exists){
+          String name = "";
+          String compound = "";
+          String weight = "";
+          String price = "";
+          String cookTime = "";
+          String options = "";
+
+          snapshot.children.forEach((element) {
+            switch(element.key.toString()){
+              case "name":
+                name = element.value.toString();
+                break;
+              case "compound":
+                compound = element.value.toString();
+                break;
+              case "weight":
+                weight = element.value.toString();
+                break;
+              case "price":
+                price = element.value.toString();
+                break;
+              case "cookTime":
+                cookTime = element.value.toString();
+                break;
+              case "options":
+                options = element.value.toString();
+                break;
+            }
+          });
+          dishList.add(Dish(id: snapshot.key.toString(), type: element.split("/")[0], name: name, compound: compound, price: price, weight: weight, cookTime: cookTime, options: List.empty()));
+        }else{
+          print('No data available.');
+        }
+      }
+      Repository.topController.add(dishList);
+    }else{
+      print('No data available.');
+    }
+  }
+
+  static void getFreeTable() async{
+    DatabaseReference ref = FirebaseDatabase(
+        databaseURL: "https://restaurant-2f63c-default-rtdb.europe-west1.firebasedatabase.app/").ref("tables/");
+    final snapshot = await ref.get();
+    var tableList = List<TableItem>.empty(growable: true);
+    if(snapshot.exists){
+      for (var element in snapshot.children) {
+        String id = "";
+        String placeCount = "";
+        String Status = "";
+        id = element.key.toString();
+        element.children.forEach((element) {
+          switch(element.key.toString()){
+            case "placeCount":
+              placeCount = element.value.toString();
+              break;
+            case "status":
+              Status = element.value.toString();
+          }
+        });
+        if(Status=="free"){
+          tableList.add(TableItem(id: id, placeCount: placeCount));
+        }
+      }
+      Repository.freeTablesController.add(tableList);
     }else{
       print('No data available.');
     }

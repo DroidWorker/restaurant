@@ -1,8 +1,8 @@
-class Feedback{
+class FeedbackItem{
   final String id;
   final String name;
   final String text;
-  Feedback({
+  FeedbackItem({
     required this.id,
     required this.name,
     required this.text
