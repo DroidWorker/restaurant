@@ -46,6 +46,7 @@ class DB{
         String weight = "";
         String price = "";
         String cookTime = "";
+        String category = "";
         String options = "";
 
         element.children.forEach((element) {
@@ -65,6 +66,9 @@ class DB{
             case "cookTime":
               cookTime = element.value.toString();
               break;
+            case "category":
+              category = element.value.toString();
+              break;
             case "options":
               options = element.value.toString();
               break;
@@ -80,8 +84,7 @@ class DB{
           var o = DishOption(name: name, startValue: startValue, endValue: endValue);
           opts.add(o);
         });
-        print(opts.toString());
-        dishes.add(Dish(id: element.key.toString(), type: type, name: name, compound: compound, price: price, weight: weight, cookTime: cookTime, options: opts));
+        dishes.add(Dish(id: element.key.toString(), type: type, name: name, compound: compound, price: price, weight: weight, cookTime: cookTime, category: category, options: opts, imgPath: ""));
       }
       Repository.dishesController.add(dishes);
     } else{
@@ -102,6 +105,7 @@ class DB{
           String weight = "";
           String price = "";
           String cookTime = "";
+          String category = "";
           String options = "";
 
           element.children.forEach((element) {
@@ -121,6 +125,9 @@ class DB{
               case "cookTime":
                 cookTime = element.value.toString();
                 break;
+              case "category":
+                category = element.value.toString();
+                break;
               case "options":
                 options = element.value.toString();
                 break;
@@ -137,7 +144,6 @@ class DB{
                 name: name, startValue: startValue, endValue: endValue);
             opts.add(o);
           });
-          print(opts.toString());
           dishes.add(Dish(id: element.key.toString(),
               type: type,
               name: name,
@@ -145,7 +151,9 @@ class DB{
               price: price,
               weight: weight,
               cookTime: cookTime,
-              options: opts));
+              category: category,
+              options: opts,
+              imgPath: ""));
         }
       } else {
         print('No data available.');
@@ -168,6 +176,7 @@ class DB{
             String weight = "";
             String price = "";
             String cookTime = "";
+            String category = "";
             String options = "";
 
             element.children.forEach((element) {
@@ -186,6 +195,9 @@ class DB{
                   break;
                 case "cookTime":
                   cookTime = element.value.toString();
+                  break;
+                case "category":
+                  category = element.value.toString();
                   break;
                 case "options":
                   options = element.value.toString();
@@ -210,7 +222,10 @@ class DB{
                 price: price,
                 weight: weight,
                 cookTime: cookTime,
-                options: opts);
+                category: category,
+                options: opts,
+            imgPath: ""
+            );
             return;
           }
         }
@@ -351,6 +366,7 @@ class DB{
           String weight = "";
           String price = "";
           String cookTime = "";
+          String category = "";
           String options = "";
 
           snapshot.children.forEach((element) {
@@ -370,12 +386,15 @@ class DB{
               case "cookTime":
                 cookTime = element.value.toString();
                 break;
+              case "category":
+                category = element.value.toString();
+                break;
               case "options":
                 options = element.value.toString();
                 break;
             }
           });
-          dishList.add(Dish(id: snapshot.key.toString(), type: element.split("/")[0], name: name, compound: compound, price: price, weight: weight, cookTime: cookTime, options: List.empty()));
+          dishList.add(Dish(id: snapshot.key.toString(), type: element.split("/")[0], name: name, compound: compound, price: price, weight: weight, cookTime: cookTime, category: category, options: List.empty(), imgPath: ""));
         }else{
           print('No data available.');
         }

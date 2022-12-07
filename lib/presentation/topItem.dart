@@ -12,6 +12,7 @@ class topItemWidget extends StatelessWidget{
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(5),
+      margin: const EdgeInsets.only(bottom: 5),
       decoration: BoxDecoration(
         border: Border.all(
           color: const Color.fromARGB(153, 170, 170, 170)
@@ -20,7 +21,7 @@ class topItemWidget extends StatelessWidget{
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Image.asset(imgPath, width: 100),
+            Image.asset((imgPath!="")? imgPath : "assets/images/spices.png", width: 100),
             Expanded(child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [

@@ -5,6 +5,7 @@ import 'package:restaurant_v2/data/repository.dart';
 import 'package:restaurant_v2/domain/model/dish.dart';
 import 'package:restaurant_v2/presentation/aboutScreen.dart';
 import 'package:restaurant_v2/presentation/authRegScreen.dart';
+import 'package:restaurant_v2/presentation/drawerListItem.dart';
 import 'package:restaurant_v2/presentation/menuTop.dart';
 import 'package:restaurant_v2/presentation/orderListScreen.dart';
 import 'package:restaurant_v2/presentation/orderitemScreen.dart';
@@ -126,8 +127,9 @@ class _HomeState extends State<Home> {
 
           ): screen==2? AboutScreenWidget(
 
-          ): screen==3? const MenuScreenWidget(
-
+          ): screen==3? MenuScreenWidget(
+            mode: screenParam,
+            key: UniqueKey(),
           ): screen==4? const OrderListScreenWidget(
 
           ): screen==5? const OrderItemScreenWidget(
@@ -172,7 +174,7 @@ class _HomeState extends State<Home> {
                         onPressed: (){
                           setState(() {
                             screenParam=1;
-                            screen=4;
+                            screen=6;
                             Navigator.pop(context);
                           });
                         },
@@ -205,7 +207,30 @@ class _HomeState extends State<Home> {
                 Expanded(
                   child: ListView(
                     children: [
-
+                      GestureDetector(onTap: (){setState(() {
+                        DB.getAllDishes();
+                        screenParam=0;
+                        screen=3;
+                        Navigator.pop(context);
+                      });},child: const DrawerListItemWidget(itemName: "ОТКРЫТЬ МЕНЮ", itemIcon: "assets/images/allmenu.png")),
+                      GestureDetector(onTap: (){setState(() {
+                        DB.getDishesByType("eat");
+                        screenParam=1;
+                        screen=3;
+                        Navigator.pop(context);
+                      });},child: const DrawerListItemWidget(itemName: "ЕДА", itemIcon: "assets/images/eat_burger.png")),
+                      GestureDetector(onTap: (){setState(() {
+                        DB.getDishesByType("drink");
+                        screenParam=2;
+                        screen=3;
+                        Navigator.pop(context);
+                      });},child: const DrawerListItemWidget(itemName: "НАПИТКИ", itemIcon: "assets/images/drink.png")),
+                      GestureDetector(onTap: (){setState(() {
+                        DB.getDishesByType("other");
+                        screenParam=3;
+                        screen=3;
+                        Navigator.pop(context);
+                      });},child: const DrawerListItemWidget(itemName: "РАЗНОЕ", itemIcon: "assets/images/spices.png"))
                     ],
                   ),
                 ),
@@ -225,6 +250,7 @@ class _HomeState extends State<Home> {
                             //Scaffold.of(context).openEndDrawer();
                             Navigator.pop(context);
                           });},
+
                           child: const Text("ОТЗЫВЫ"),
                           style: ElevatedButton.styleFrom(primary: const Color.fromARGB(255, 72, 216, 22)),
                         )

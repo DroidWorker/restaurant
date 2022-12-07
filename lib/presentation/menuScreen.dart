@@ -1,29 +1,53 @@
+import 'dart:async';
+
 import 'package:flutter/cupertino.dart';
+import 'package:restaurant_v2/data/repository.dart';
 import 'package:restaurant_v2/domain/model/dish.dart';
 import 'package:restaurant_v2/domain/model/menuItem.dart';
 import 'package:restaurant_v2/presentation/menuCategory.dart';
 import 'package:restaurant_v2/presentation/topItem.dart';
 
 class MenuScreenWidget extends StatefulWidget{
-  const MenuScreenWidget({Key? key}) : super(key: key);
+  int mode = 0;
+  MenuScreenWidget({required this.mode, Key? key}) : super(key: key);
 
   @override
-  _state createState() => _state();
+  _state createState() => _state(this.mode);
 }
 
 class _state extends State<MenuScreenWidget>{
+  int mode = 0;//0-full menu
+              //1-eat
+              //2-drink
+              //3-other
   int type = 0;
   int categoryId = 0;
-  List dishes = [
-    Dish(id:"", type: "", name: "Крем-суп из тыквы", compound: "Тыква,  репчатый лук,  чеснок,  сливочное масло,  сливки,  растительное масло,  бекон, соль . . .", price: "16 р", weight: "220 г", cookTime: "", options: List.empty(), imgPath: "assets/images/image.png"),
-    Dish(id:"", type:"", name: "Крем-суп из тыквы", compound: "Курица,  перловая крупа,  сухие грибы,  картофель, морковь, лук, масло растительное, соль", price: "10 р", weight: "320 г", cookTime: "", options: List.empty(), imgPath: "assets/images/image.png")
+
+  StreamSubscription? subscription;
+
+  _state(this.mode);
+
+  List menuCategories = [ ];
+
+  List<Dish> dishes = [
+    Dish(id:"", type: "", name: "Крем-суп из тыквы", compound: "Тыква,  репчатый лук,  чеснок,  сливочное масло,  сливки,  растительное масло,  бекон, соль . . .", price: "16 р", weight: "220 г", cookTime: "", category: "1", options: List.empty(), imgPath: "assets/images/image.png"),
+    Dish(id:"", type:"", name: "Крем-суп из тыквы", compound: "Курица,  перловая крупа,  сухие грибы,  картофель, морковь, лук, масло растительное, соль", price: "10 р", weight: "320 г", cookTime: "", category: "1", options: List.empty(), imgPath: "assets/images/image.png")
   ];
-  List menuCategories = [
-    MenuItem(id: 0, name: "Горячее", imgPath: "assets/images/hot.png"),
-    MenuItem(id: 1, name: "Супы", imgPath: "assets/images/hot.png"),
-    MenuItem(id: 2, name: "Гарниры", imgPath: "assets/images/hot.png"),
-    MenuItem(id: 3, name: "Десерты", imgPath: "assets/images/hot.png")
-  ];
+  List showDishes = [ ];
+
+  @override void initState() {
+      subscription = Repository.dishesController.stream.listen((item) =>
+      {
+        setState(() {
+          dishes = item;
+          subscription?.cancel();
+        })
+      }
+      );
+
+    setCategories(mode);
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -40,6 +64,12 @@ class _state extends State<MenuScreenWidget>{
                     setState(() {
                       type = 1;
                       categoryId = menuCategories[index].id;
+                      showDishes.clear();
+                      for (var element in dishes) {
+                        if(element.category==categoryId.toString()){
+                          showDishes.add(element);
+                        }
+                      }
                     });
                   },
                   child: Menucategory(
@@ -53,12 +83,19 @@ class _state extends State<MenuScreenWidget>{
               : type == 1 ? Expanded(
               child: Column(
             children: [
-              const Menucategory(text: "Супы", imageAssetPath: "assets/images/hot.png", iconDown: false,),
+                  GestureDetector(
+                      onTap: (){
+                        setState(() {
+                          type = 0;
+                          });
+                        },
+                      child: Menucategory(text: menuCategories.isNotEmpty ? menuCategories[getRealId(categoryId.toString())].name : "", imageAssetPath: "assets/images/hot.png", iconDown: false,)
+                  ),
               Expanded(
                 child: ListView.builder(
-                  itemCount: dishes.length,
+                  itemCount: showDishes.length,
                     itemBuilder: (BuildContext context, int index){
-                    return topItemWidget(topName: dishes[index].name, compound: dishes[index].compound, price: dishes[index].price, weight: dishes[index].weight, imgPath: dishes[index].imgPath);
+                    return topItemWidget(topName: showDishes[index].name, compound: showDishes[index].compound, price: showDishes[index].price, weight: showDishes[index].weight, imgPath: showDishes[index].imgPath);
                 })
               )
             ],
@@ -69,4 +106,64 @@ class _state extends State<MenuScreenWidget>{
     );
   }
 
+  @override
+  void dispose(){
+    subscription?.cancel;
+    super.dispose();
+  }
+
+  void setCategories(int type){
+    switch(type){
+      case 0:
+        menuCategories = [
+          MenuItem(id: 0, name: "Горячее", imgPath: "assets/images/hot.png"),
+          MenuItem(id: 1, name: "Супы", imgPath: "assets/images/hot.png"),
+          MenuItem(id: 2, name: "Гарниры", imgPath: "assets/images/hot.png"),
+          MenuItem(id: 3, name: "Десерты", imgPath: "assets/images/hot.png"),
+          MenuItem(id: 4, name: "Кофе", imgPath: "assets/images/hot.png"),
+          MenuItem(id: 5, name: "Коктейли", imgPath: "assets/images/hot.png"),
+          MenuItem(id: 6, name: "Свежевыжатые соки", imgPath: "assets/images/hot.png"),
+          MenuItem(id: 7, name: "Вода", imgPath: "assets/images/hot.png"),
+          MenuItem(id: 8, name: "Соусы", imgPath: "assets/images/hot.png"),
+          MenuItem(id: 9, name: "Специи", imgPath: "assets/images/hot.png")
+        ];
+        break;
+      case 1:
+        menuCategories = [
+          MenuItem(id: 0, name: "Горячее", imgPath: "assets/images/hot.png"),
+          MenuItem(id: 1, name: "Супы", imgPath: "assets/images/hot.png"),
+          MenuItem(id: 2, name: "Гарниры", imgPath: "assets/images/hot.png"),
+          MenuItem(id: 3, name: "Десерты", imgPath: "assets/images/hot.png")
+        ];
+        break;
+      case 2:
+        menuCategories = [
+          MenuItem(id: 4, name: "Кофе", imgPath: "assets/images/hot.png"),
+          MenuItem(id: 5, name: "Коктейли", imgPath: "assets/images/hot.png"),
+          MenuItem(id: 6, name: "Свежевыжатые соки", imgPath: "assets/images/hot.png"),
+          MenuItem(id: 7, name: "Вода", imgPath: "assets/images/hot.png")
+        ];
+        break;
+      case 3:
+        menuCategories = [
+          MenuItem(id: 8, name: "Соусы", imgPath: "assets/images/hot.png"),
+          MenuItem(id: 9, name: "Специи", imgPath: "assets/images/hot.png")
+        ];
+        break;
+    }
+  }
+
+  int getRealId(String id){
+    switch(mode){
+      case 0:
+        return int.parse(id);
+      case 1:
+        return int.parse(id);
+      case 2:
+        return (int.parse(id)-4);
+      case 3:
+        return (int.parse(id)-8);
+    }
+    return 0;
+  }
 }

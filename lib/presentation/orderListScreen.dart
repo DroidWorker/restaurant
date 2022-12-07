@@ -13,8 +13,8 @@ class OrderListScreenWidget extends StatefulWidget{
 
 class _state extends State<OrderListScreenWidget>{
   List dishes = [
-    Dish(id: "", type: "", name: "Крем-суп из тыквы", compound: "Тыква,  репчатый лук,  чеснок,  сливочное масло,  сливки,  растительное масло,  бекон, соль . . .", price: "16 р", weight: "220 г", cookTime: "", options: List.empty(), imgPath: "assets/images/image.png"),
-    Dish(id: "", type: "", name: "Крем-суп из тыквы", compound: "Курица,  перловая крупа,  сухие грибы,  картофель, морковь, лук, масло растительное, соль", price: "10 р", weight: "320 г", cookTime: "", options: List.empty(), imgPath: "assets/images/image.png")
+    Dish(id: "", type: "", name: "Крем-суп из тыквы", compound: "Тыква,  репчатый лук,  чеснок,  сливочное масло,  сливки,  растительное масло,  бекон, соль . . .", price: "16 р", weight: "220 г", cookTime: "", category: "1", options: List.empty(), imgPath: "assets/images/image.png"),
+    Dish(id: "", type: "", name: "Крем-суп из тыквы", compound: "Курица,  перловая крупа,  сухие грибы,  картофель, морковь, лук, масло растительное, соль", price: "10 р", weight: "320 г", cookTime: "", category: "1", options: List.empty(), imgPath: "assets/images/image.png")
   ];
 
   String getSumm(){
@@ -26,6 +26,7 @@ class _state extends State<OrderListScreenWidget>{
   @override
   Widget build(BuildContext context) {
     String summ = getSumm();
+
     return Container(
       padding: const EdgeInsets.all(10),
       child: Column(

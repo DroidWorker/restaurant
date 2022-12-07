@@ -8,8 +8,9 @@ class Dish{
   final String price;
   final String weight;
   final String cookTime;
+  final String category;
   final List<DishOption> options;
-  final String? imgPath;
+  final String imgPath;
   Dish({
     required this.id,
     required this.type,
@@ -18,7 +19,8 @@ class Dish{
     required this.price,
     required this.weight,
     required this.cookTime,
+    required this.category,
     required this.options,
-    this.imgPath
+    required this.imgPath
 });
 }
