@@ -31,7 +31,8 @@ class _HomeState extends State<Home> {
     );
   }
 
-  int screen = 0;
+  int _dishId = 0;
+  static int screen = 0;
   //0-main screen
   //1-review screen
   //2-about screen
@@ -82,15 +83,13 @@ class _HomeState extends State<Home> {
         ),
         actions: [
           IconButton(onPressed: (){
-            //DB.register("surname", "name", "+35986542136", "{email}", "password");
-            DB.getDishesByType("eat");
-            Repository.dishesController.stream.listen((item) =>
-            (item as List<Dish>).forEach((element) {
-              print("aaa01-"+element.name);
-            })
-            );
+
             }, icon: const Icon(Icons.share, color: Colors.white)),
-          IconButton(onPressed: (){}, icon: Image.asset("assets/images/backet.png")),
+          IconButton(onPressed: (){
+            setState(() {
+              screen = 4;
+            });
+          }, icon: Image.asset("assets/images/backet.png")),
           //IconButton(onPressed: () => Scaffold.of().openDrawer(), icon: const Icon(Icons.menu, color: Colors.white))
           Builder(builder: (context){
             return IconButton(onPressed: () => Scaffold.of(context).openDrawer(), icon: const Icon(Icons.menu, color: Colors.white));
@@ -128,12 +127,16 @@ class _HomeState extends State<Home> {
           ): screen==2? AboutScreenWidget(
 
           ): screen==3? MenuScreenWidget(
+            updateRoot: (int openScreen, int dishId){setState(() {
+              screen=5;
+              _dishId = dishId;
+            });},
             mode: screenParam,
             key: UniqueKey(),
           ): screen==4? const OrderListScreenWidget(
 
-          ): screen==5? const OrderItemScreenWidget(
-
+          ): screen==5? OrderItemScreenWidget(
+            dishId: _dishId
           ): screen==6? AuthRegScreenWidget(
             mode: screenParam,
             key: UniqueKey(),

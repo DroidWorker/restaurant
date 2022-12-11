@@ -211,6 +211,7 @@ class DB{
               String vals = element.split("(")[1];
               String startValue = vals.split("-")[0];
               String endValue = vals.split("-")[1];
+              endValue = endValue.replaceAll(")", "");
               var o = DishOption(
                   name: name, startValue: startValue, endValue: endValue);
               opts.add(o);
@@ -224,8 +225,11 @@ class DB{
                 cookTime: cookTime,
                 category: category,
                 options: opts,
-            imgPath: ""
+                imgPath: ""
             );
+            if(dish!=null) {
+              Repository.dishItemController.add(dish);
+            }
             return;
           }
         }
@@ -233,8 +237,93 @@ class DB{
         print('No data available.');
       }
     }
-    if(dish!=null) {
-      Repository.dishItemController.add(dish);
+  }
+
+  static void getDishByIds(List<String> ids) async{
+    var dishes = List<Dish>.empty(growable: true);
+    for(var type in {"eat","drink","other"}) {
+      DatabaseReference ref = FirebaseDatabase(
+          databaseURL: "https://restaurant-2f63c-default-rtdb.europe-west1.firebasedatabase.app/").ref("dishes/" + type);
+      final snapshot = await ref.get();
+      if (snapshot.exists) {
+        for (var element in snapshot.children) {
+          if (ids.contains(element.key.toString())) {
+            int count = 0;
+            ids.forEach((id) {
+              if(id==element.key.toString()){
+                count++;
+              }
+            });
+            String name = "";
+            String compound = "";
+            String weight = "";
+            String price = "";
+            String cookTime = "";
+            String category = "";
+            String options = "";
+
+            element.children.forEach((element) {
+              switch (element.key.toString()) {
+                case "name":
+                  name = element.value.toString();
+                  break;
+                case "compound":
+                  compound = element.value.toString();
+                  break;
+                case "weight":
+                  weight = element.value.toString();
+                  break;
+                case "price":
+                  price = element.value.toString();
+                  break;
+                case "cookTime":
+                  cookTime = element.value.toString();
+                  break;
+                case "category":
+                  category = element.value.toString();
+                  break;
+                case "options":
+                  options = element.value.toString();
+                  break;
+              }
+            });
+            var opt = options.split("|");
+            List<DishOption> opts = List<DishOption>.empty(growable: true);
+            opt.forEach((element) {
+              String name = element.split("(")[0];
+              String vals = element.split("(")[1];
+              String startValue = vals.split("-")[0];
+              String endValue = vals.split("-")[1];
+              endValue = endValue.replaceAll(")", "");
+              var o = DishOption(
+                  name: name, startValue: startValue, endValue: endValue);
+              opts.add(o);
+            });
+            for(int i=0; i<count; i++) {
+              dishes.add(Dish(id: element.key.toString(),
+                  type: type,
+                  name: name,
+                  compound: compound,
+                  price: price,
+                  weight: weight,
+                  cookTime: cookTime,
+                  category: category,
+                  options: opts,
+                  imgPath: ""
+              ));
+            }
+            if(dishes.length==ids.length){
+              Repository.dishesController.add(dishes);
+              return;
+            }
+          }
+        }
+        if(dishes.isNotEmpty) {
+          Repository.dishesController.add(dishes);
+        }
+      } else {
+        print('No data available.');
+      }
     }
   }
 
@@ -286,13 +375,12 @@ class DB{
     }
   }
 
-  static void addOrder(String userId, String comment, String tableId, Map<String, DishOrderItem> dishes) async{
+  static void addOrder(String userId, String tableId, Map<String, DishOrderItem> dishes) async{
     DatabaseReference ref = FirebaseDatabase(
         databaseURL: "https://restaurant-2f63c-default-rtdb.europe-west1.firebasedatabase.app/").ref("orders/");
     final snapshot = await ref.get();
     if(snapshot.exists){
       await ref.child(userId).set({
-        "comment":comment,
         "tableId": tableId,
         "dishes": dishes
       });
@@ -319,12 +407,12 @@ class DB{
             break;
           case "dishes":
             for (var element in element.children) {
-              String dishType = "";
+              String comment = "";
               List<OrderOption> opts = List<OrderOption>.empty(growable: true);
               for (var element in element.children) {
                 switch(element.key){
-                  case "dishType":
-                    dishType = element.value.toString();
+                  case "comment":
+                    comment = element.value.toString();
                     break;
                   case "options":
                     var optPair = element.value.toString().split("|");
@@ -334,7 +422,7 @@ class DB{
                     break;
                 }
               }
-              DishOrderItem doi = DishOrderItem(options: opts, dishType: dishType);
+              DishOrderItem doi = DishOrderItem(options: opts, comment: comment);
               dishes[element.value.toString()] = doi;
             }
             break;
@@ -407,7 +495,7 @@ class DB{
 
   static void getFreeTable() async{
     DatabaseReference ref = FirebaseDatabase(
-        databaseURL: "https://restaurant-2f63c-default-rtdb.europe-west1.firebasedatabase.app/").ref("tables/");
+        databaseURL: "https://restaurant-2f63c-default-rtdb.europe-west1.firebasedatabase.app/").ref("Tables/");
     final snapshot = await ref.get();
     var tableList = List<TableItem>.empty(growable: true);
     if(snapshot.exists){
@@ -418,7 +506,7 @@ class DB{
         id = element.key.toString();
         element.children.forEach((element) {
           switch(element.key.toString()){
-            case "placeCount":
+            case "PlaceCount":
               placeCount = element.value.toString();
               break;
             case "status":

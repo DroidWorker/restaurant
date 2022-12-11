@@ -9,13 +9,16 @@ import 'package:restaurant_v2/presentation/topItem.dart';
 
 class MenuScreenWidget extends StatefulWidget{
   int mode = 0;
-  MenuScreenWidget({required this.mode, Key? key}) : super(key: key);
+  Function updateRoot;
+  MenuScreenWidget({required Function this.updateRoot, required this.mode, Key? key}) : super(key: key);
 
   @override
-  _state createState() => _state(this.mode);
+  _state createState() => _state(updateRoot, mode);
 }
 
 class _state extends State<MenuScreenWidget>{
+  Function update;
+  _state(this.update, this.mode);
   int mode = 0;//0-full menu
               //1-eat
               //2-drink
@@ -24,8 +27,6 @@ class _state extends State<MenuScreenWidget>{
   int categoryId = 0;
 
   StreamSubscription? subscription;
-
-  _state(this.mode);
 
   List menuCategories = [ ];
 
@@ -95,7 +96,10 @@ class _state extends State<MenuScreenWidget>{
                 child: ListView.builder(
                   itemCount: showDishes.length,
                     itemBuilder: (BuildContext context, int index){
-                    return topItemWidget(topName: showDishes[index].name, compound: showDishes[index].compound, price: showDishes[index].price, weight: showDishes[index].weight, imgPath: showDishes[index].imgPath);
+                    return GestureDetector(
+                      onTap: (){update(5, int.parse(showDishes[index].id));},
+                      child: topItemWidget(topName: showDishes[index].name, compound: showDishes[index].compound, price: showDishes[index].price, weight: showDishes[index].weight, imgPath: showDishes[index].imgPath),
+                    );
                 })
               )
             ],
