@@ -11,6 +11,7 @@ import '../domain/model/dish.dart';
 import 'package:number_selection/number_selection.dart';
 
 List<TableItem> list = <TableItem>[TableItem(id: "0", placeCount: "0"), TableItem(id: "1", placeCount: "0")];
+String selectedTable = "";
 
 class OrderListScreenWidget extends StatefulWidget{
   const OrderListScreenWidget({Key? key}) : super(key: key);
@@ -23,6 +24,10 @@ class _state extends State<OrderListScreenWidget>{
   List dishes = [
     Dish(id: "", type: "", name: "Крем-суп из тыквы", compound: "Тыква,  репчатый лук,  чеснок,  сливочное масло,  сливки,  растительное масло,  бекон, соль . . .", price: "16 р", weight: "220 г", cookTime: "", category: "1", options: List.empty(), imgPath: "assets/images/image.png")
   ];
+  String _timeh = "10";
+  String _timem = "30";
+  int _curTimeh = 10;
+  int _curTimem = 0;
 
   StreamSubscription? subscription, tablesSubscription;
 
@@ -33,6 +38,9 @@ class _state extends State<OrderListScreenWidget>{
   }
 
   @override void initState() {
+    var datetime = DateTime.now();
+    _curTimeh = datetime.hour;
+    _curTimem = datetime.minute;
     Repository.getOrdersFromSP();
     subscription = Repository.dishesController.stream.listen((item) =>
     {
@@ -47,9 +55,7 @@ class _state extends State<OrderListScreenWidget>{
     {
       setState(() {
         list = item;
-        list.forEach((element) {
-          print(element.id);
-        });
+        selectedTable = list.first.id;
         tablesSubscription?.cancel();
       })
     }
@@ -77,6 +83,7 @@ class _state extends State<OrderListScreenWidget>{
               itemCount: dishes.length,
               itemBuilder: (BuildContext context, int index) {
                 return OrderListItemWidget(
+                      id: dishes[index].id,
                       topName: dishes[index].name,
                       compound: dishes[index].compound,
                       price: dishes[index].price,
@@ -99,7 +106,7 @@ class _state extends State<OrderListScreenWidget>{
                           mainAxisSize: MainAxisSize.min,
                           children: <Widget>[
                             const Text('Выберите стол', style: TextStyle(color: Colors.white, fontSize: 18)),
-                            const MDropdownButton(),
+                            MDropdownButton(f: (String value){selectedTable = value;},),
                             SizedBox(
                               height: 90,
                                 child: Row(
@@ -113,12 +120,12 @@ class _state extends State<OrderListScreenWidget>{
                                       numberColor: Colors.white,
                                       backgroundColor: Colors.white,
                                       outOfConstraintsColor: Colors.deepOrange),
-                                  initialValue: 10,
-                                  minValue: 10,
+                                  initialValue: _curTimeh,
+                                  minValue: _curTimeh,
                                   maxValue: 21,
                                   direction: Axis.vertical,
                                   withSpring: true,
-                                  onChanged: (int value) => print("value: $value"),
+                                  onChanged: (int value) => _timeh=value.toString(),
                                   enableOnOutOfConstraintsAnimation: true,
                                   onOutOfConstraints: () => print("This value is too high or too low"),
                                 ),
@@ -133,11 +140,11 @@ class _state extends State<OrderListScreenWidget>{
                                       backgroundColor: Colors.white,
                                       outOfConstraintsColor: Colors.deepOrange),
                                   initialValue: 30,
-                                  minValue: 00,
+                                  minValue: int.parse(_timeh)>_curTimeh ? 59 : _curTimem,
                                   maxValue: 59,
                                   direction: Axis.vertical,
                                   withSpring: true,
-                                  onChanged: (int value) => print("value: $value"),
+                                  onChanged: (int value) => _timem = value.toString(),
                                   enableOnOutOfConstraintsAnimation: true,
                                   onOutOfConstraints: () => print("This value is too high or too low"),
                                 )
@@ -148,7 +155,13 @@ class _state extends State<OrderListScreenWidget>{
                               child: const Text('ПОДТВЕРДИТЬ БРОНЬ'),
                               style: ElevatedButton.styleFrom(primary: const Color.fromARGB(255, 72, 216, 22)),
                               onPressed: () {
-                                //Repository.addOrder(userId, tableId, dishes)
+                                if(selectedTable.isNotEmpty) {
+                                  Repository.addOrder(
+                                      selectedTable, _timeh+":"+_timem);
+                                }
+                                else{
+                                  print("empty fields");
+                                }
                                 Navigator.pop(context);
                               },
                             ),
@@ -169,13 +182,16 @@ class _state extends State<OrderListScreenWidget>{
   }
 }
 class MDropdownButton extends StatefulWidget {
-  const MDropdownButton({Key? key}) : super(key: key);
+  Function f;
+  MDropdownButton({required this.f, Key? key}) : super(key: key);
 
   @override
-  State<MDropdownButton> createState() => _MDropdownButtonState();
+  State<MDropdownButton> createState() => _MDropdownButtonState(f);
 }
 
 class _MDropdownButtonState extends State<MDropdownButton> {
+  late Function f;
+  _MDropdownButtonState(this.f);
   String dropdownValue = list.first.id.toString();//"стол "+list.first.id+" количество мест: "+list.first.placeCount;
 
   @override
@@ -193,6 +209,7 @@ class _MDropdownButtonState extends State<MDropdownButton> {
       onChanged: (String? value) {
         // This is called when the user selects an item.
         setState(() {
+          f(value);
           dropdownValue = value!;
         });
       },

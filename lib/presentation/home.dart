@@ -1,7 +1,7 @@
+import 'dart:async';
+
 import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
-import 'package:restaurant_v2/data/repository.dart';
 import 'package:restaurant_v2/domain/model/dish.dart';
 import 'package:restaurant_v2/presentation/aboutScreen.dart';
 import 'package:restaurant_v2/presentation/authRegScreen.dart';
@@ -14,6 +14,7 @@ import 'package:restaurant_v2/presentation/searchBox.dart';
 import 'package:restaurant_v2/presentation/topItem.dart';
 
 import '../data/db.dart';
+import '../data/repository.dart';
 import '../firebase_options.dart';
 import 'menuScreen.dart';
 
@@ -23,11 +24,33 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+  StreamSubscription? subscription, tablesSubscription;
+  List<Dish> dishes = List<Dish>.empty(growable: true);
+  List<topItemWidget> topWidgets = List<topItemWidget>.empty(growable: true);
+
+  void topitemCallback(int id){
+    setState(() {
+      screen=5;
+      _dishId = id;
+    });
+  }
 
   void initFirebase() async{
     WidgetsFlutterBinding.ensureInitialized();
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
+    );
+    Repository.getTop();
+    subscription = Repository.topController.stream.listen((item) =>
+    {
+      setState(() {
+        dishes = item;
+        for (var element in dishes) {
+          topWidgets.add(topItemWidget(callback: topitemCallback, id: element.id, topName: element.name, compound: element.compound, price: element.price, weight: element.weight, imgPath: "imgPath"));
+        }
+        subscription?.cancel();
+      })
+    }
     );
   }
 
@@ -109,16 +132,7 @@ class _HomeState extends State<Home> {
                   const SizedBox(height: 20),
                   Image.asset("assets/images/topofday.png"),
                   const SizedBox(height: 10),
-                  const topItemWidget(topName: "Пицца пепперони", compound: "Томатный соус, салями, сыр Моцарелла, маслины, чесночное масло", price: "15 p", weight: "550 г", imgPath: "assets/images/image.png",),
-                  const SizedBox(height: 10),
-                  const topItemWidget(topName: "Пицца пепперони", compound: "Томатный соус, салями, сыр Моцарелла, маслины, чесночное масло", price: "14 p", weight: "530 г", imgPath: "assets/images/image.png",),
-                  const SizedBox(height: 10),
-                  const topItemWidget(topName: "Пицца пепперони", compound: "Томатный соус, салями, сыр Моцарелла, маслины, чесночное масло", price: "20 p", weight: "560 г", imgPath: "assets/images/image.png",),
-                  const SizedBox(height: 10),
-                  const topItemWidget(topName: "Пицца пепперони", compound: "Томатный соус, салями, сыр Моцарелла, маслины, чесночное масло", price: "17 p", weight: "650 г", imgPath: "assets/images/image.png",),
-                  const SizedBox(height: 10),
-                  const topItemWidget(topName: "Пицца пепперони", compound: "Томатный соус, салями, сыр Моцарелла, маслины, чесночное масло", price: "16 p", weight: "440 г", imgPath: "assets/images/image.png",),
-                  const SizedBox(height: 10)
+                  Column(children: topWidgets)
                 ],
               ),
             ),
@@ -127,7 +141,7 @@ class _HomeState extends State<Home> {
           ): screen==2? AboutScreenWidget(
 
           ): screen==3? MenuScreenWidget(
-            updateRoot: (int openScreen, int dishId){setState(() {
+            updateRoot: (int dishId){setState(() {
               screen=5;
               _dishId = dishId;
             });},

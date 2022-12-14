@@ -6,7 +6,7 @@ class menuTopWidget extends StatelessWidget{
   Widget build(BuildContext context) {
     return Container(
       height: 270,
-      padding: EdgeInsets.all(10),
+      padding: const EdgeInsets.all(10),
       decoration: const BoxDecoration(
         color: Color.fromARGB(255, 240, 238, 238),
         borderRadius: BorderRadius.all(Radius.circular(5))
@@ -22,13 +22,13 @@ class menuTopWidget extends StatelessWidget{
               Expanded(child: Container(
                 height: 90,
                 color: Colors.white,
-                padding: EdgeInsets.all(5),
-                margin: EdgeInsets.fromLTRB(5, 0, 5, 5),
+                padding: const EdgeInsets.all(5),
+                margin: const EdgeInsets.fromLTRB(5, 0, 5, 5),
                 child:
                   Column(
                     children: [
                       Image.asset("assets/images/image.png"),
-                      Text("text")
+                      const Text("text")
                     ],
                   )
               ),
@@ -36,13 +36,13 @@ class menuTopWidget extends StatelessWidget{
               Expanded(child: Container(
                   height: 90,
                   color: Colors.white,
-                  padding: EdgeInsets.all(5),
-                  margin: EdgeInsets.fromLTRB(5, 0, 5, 5),
+                  padding: const EdgeInsets.all(5),
+                  margin: const EdgeInsets.fromLTRB(5, 0, 5, 5),
                   child:
                   Column(
                     children: [
                       Image.asset("assets/images/image.png"),
-                      Text("text")
+                      const Text("text")
                     ],
                   )
               ),
@@ -50,13 +50,13 @@ class menuTopWidget extends StatelessWidget{
               Expanded(child: Container(
                   height: 90,
                   color: Colors.white,
-                  padding: EdgeInsets.all(5),
-                  margin: EdgeInsets.fromLTRB(5, 0, 5, 5),
+                  padding: const EdgeInsets.all(5),
+                  margin: const EdgeInsets.fromLTRB(5, 0, 5, 5),
                   child:
                   Column(
                     children: [
                       Image.asset("assets/images/image.png"),
-                      Text("text")
+                      const Text("text")
                     ],
                   )
               )
@@ -71,39 +71,39 @@ class menuTopWidget extends StatelessWidget{
             children: [
               Expanded(child: Container(
                   color: Colors.white,
-                  padding: EdgeInsets.all(5),
+                  padding: const EdgeInsets.all(5),
                   margin: const EdgeInsets.fromLTRB(5, 0, 5, 5),
                   child:
                   Column(
                     children: [
                       Image.asset("assets/images/image.png"),
-                      Text("text")
+                      const Text("text")
                     ],
                   )
               ),
               ),
               Expanded(child: Container(
                   color: Colors.white,
-                  padding: EdgeInsets.all(5),
+                  padding: const EdgeInsets.all(5),
                   margin: const EdgeInsets.fromLTRB(5, 0, 5, 5),
                   child:
                   Column(
                     children: [
                       Image.asset("assets/images/image.png"),
-                      Text("text")
+                      const Text("text")
                     ],
                   )
               ),
               ),
               Expanded(child: Container(
                   color: Colors.white,
-                  padding: EdgeInsets.all(5),
+                  padding: const EdgeInsets.all(5),
                   margin: const EdgeInsets.fromLTRB(5, 0, 5, 5),
                   child:
                   Column(
                     children: [
                       Image.asset("assets/images/image.png"),
-                      Text("text")
+                      const Text("text")
                     ],
                   )
               ),
@@ -118,7 +118,7 @@ class menuTopWidget extends StatelessWidget{
               children: [
                 Expanded(child: Container(
                     color: Colors.white,
-                    padding: EdgeInsets.all(5),
+                    padding: const EdgeInsets.all(5),
                     margin: const EdgeInsets.fromLTRB(5, 0, 5, 5),
                     child:
                     Column(
@@ -131,7 +131,7 @@ class menuTopWidget extends StatelessWidget{
                 ),
                 Expanded(child: Container(
                     color: Colors.white,
-                    padding: EdgeInsets.all(5),
+                    padding: const EdgeInsets.all(5),
                     margin: const EdgeInsets.fromLTRB(5, 0, 5, 5),
                     child:
                     Column(
@@ -144,7 +144,7 @@ class menuTopWidget extends StatelessWidget{
                 ),
                 Expanded(child: Container(
                     color: Colors.white,
-                    padding: EdgeInsets.all(5),
+                    padding: const EdgeInsets.all(5),
                     margin: const EdgeInsets.fromLTRB(5, 0, 5, 5),
                     child:
                     Column(

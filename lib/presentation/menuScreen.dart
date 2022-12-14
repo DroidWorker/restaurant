@@ -97,8 +97,8 @@ class _state extends State<MenuScreenWidget>{
                   itemCount: showDishes.length,
                     itemBuilder: (BuildContext context, int index){
                     return GestureDetector(
-                      onTap: (){update(5, int.parse(showDishes[index].id));},
-                      child: topItemWidget(topName: showDishes[index].name, compound: showDishes[index].compound, price: showDishes[index].price, weight: showDishes[index].weight, imgPath: showDishes[index].imgPath),
+                      onTap: (){update(int.parse(showDishes[index].id));},
+                      child: topItemWidget(callback: update, id: showDishes[index].id,topName: showDishes[index].name, compound: showDishes[index].compound, price: showDishes[index].price, weight: showDishes[index].weight, imgPath: showDishes[index].imgPath),
                     );
                 })
               )

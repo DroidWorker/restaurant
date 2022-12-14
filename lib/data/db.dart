@@ -7,6 +7,8 @@ import 'package:restaurant_v2/domain/model/feedback.dart';
 import 'package:restaurant_v2/domain/model/myOrder.dart';
 import 'package:restaurant_v2/domain/model/orderOption.dart';
 import 'package:restaurant_v2/domain/model/table.dart';
+import 'package:restaurant_v2/domain/model/writeOrderItem.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../domain/model/orderItem.dart';
 
@@ -20,6 +22,8 @@ class DB{
       for (var element in snapshot.children) {
         if(int.parse(element.key!)>id){
           id = int.parse(element.key!);
+          SharedPreferences prefs = await SharedPreferences.getInstance();
+          prefs.setString("myId", id.toString());
         }
       }
       id++;
@@ -240,16 +244,20 @@ class DB{
   }
 
   static void getDishByIds(List<String> ids) async{
+    var clearIds = List<String>.empty(growable: true);
     var dishes = List<Dish>.empty(growable: true);
+    for (var element in ids) {
+      clearIds.add(element.split("-")[0]);
+    }
     for(var type in {"eat","drink","other"}) {
       DatabaseReference ref = FirebaseDatabase(
           databaseURL: "https://restaurant-2f63c-default-rtdb.europe-west1.firebasedatabase.app/").ref("dishes/" + type);
       final snapshot = await ref.get();
       if (snapshot.exists) {
         for (var element in snapshot.children) {
-          if (ids.contains(element.key.toString())) {
+          if (clearIds.contains(element.key.toString())) {
             int count = 0;
-            ids.forEach((id) {
+            clearIds.forEach((id) {
               if(id==element.key.toString()){
                 count++;
               }
@@ -300,7 +308,7 @@ class DB{
               opts.add(o);
             });
             for(int i=0; i<count; i++) {
-              dishes.add(Dish(id: element.key.toString(),
+              dishes.add(Dish(id: ids.firstWhere((id) => id.split("-")[0]==element.key.toString()),
                   type: type,
                   name: name,
                   compound: compound,
@@ -311,6 +319,7 @@ class DB{
                   options: opts,
                   imgPath: ""
               ));
+              ids.removeWhere((id) => dishes.last.id==id);
             }
             if(dishes.length==ids.length){
               Repository.dishesController.add(dishes);
@@ -320,6 +329,9 @@ class DB{
         }
         if(dishes.isNotEmpty) {
           Repository.dishesController.add(dishes);
+        }
+        else{
+          Repository.dishesController.add([Dish(id: "0", type: "null", name: "отсутствуют", compound: "", price: "0", weight: "", cookTime: "", category: "", options: List.empty(), imgPath: "")]);
         }
       } else {
         print('No data available.');
@@ -375,14 +387,17 @@ class DB{
     }
   }
 
-  static void addOrder(String userId, String tableId, Map<String, DishOrderItem> dishes) async{
+  static void addOrder(String userId, String tableId, String time, Map<String, Map<String, String>> dishes) async{
     DatabaseReference ref = FirebaseDatabase(
         databaseURL: "https://restaurant-2f63c-default-rtdb.europe-west1.firebasedatabase.app/").ref("orders/");
     final snapshot = await ref.get();
     if(snapshot.exists){
-      await ref.child(userId).set({
-        "tableId": tableId,
-        "dishes": dishes
+      await ref.set({
+        userId: {
+          "tableId": tableId,
+          "time": time,
+          "dishes": dishes
+        }
       });
     }else{
       print('No data available.');
@@ -434,7 +449,7 @@ class DB{
     }
   }
 
-  static void getTop()async{
+  static void getTop() async {
     DatabaseReference ref = FirebaseDatabase(
         databaseURL: "https://restaurant-2f63c-default-rtdb.europe-west1.firebasedatabase.app/").ref("top/");
     final snapshot = await ref.get();
@@ -446,7 +461,7 @@ class DB{
       }
       for (var element in topList) {
         ref = FirebaseDatabase(
-            databaseURL: "https://restaurant-2f63c-default-rtdb.europe-west1.firebasedatabase.app/").ref(element);
+            databaseURL: "https://restaurant-2f63c-default-rtdb.europe-west1.firebasedatabase.app/").ref("dishes/"+element);
         final snapshot = await ref.get();
         if(snapshot.exists){
           String name = "";
@@ -484,12 +499,12 @@ class DB{
           });
           dishList.add(Dish(id: snapshot.key.toString(), type: element.split("/")[0], name: name, compound: compound, price: price, weight: weight, cookTime: cookTime, category: category, options: List.empty(), imgPath: ""));
         }else{
-          print('No data available.');
+          print('No data available.503');
         }
       }
       Repository.topController.add(dishList);
     }else{
-      print('No data available.');
+      print('No data available.508');
     }
   }
 
